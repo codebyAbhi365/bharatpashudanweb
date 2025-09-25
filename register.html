@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bharat Pashudhan - Animal Registration</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+  <div class="main-content">
+    <div class="container">
+      <div class="form-title">
+        <h2>Animal Registration Form</h2>
+      </div>
+      <!-- Progress Steps -->
+      <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
+        <div class="progress-step active" data-title="Breed Detection"></div>
+        <div class="progress-step" data-title="Animal Details"></div>
+        <div class="progress-step" data-title="Owner Details"></div>
+      </div>
+      <form id="animalForm">
+        <!-- Step 1: Breed Detection -->
+        <div class="form-step active" id="step-1">
+          <div class="image-upload-group">
+            <h4>Animal Face Image</h4>
+            <div class="image-preview image-preview-small" id="faceImagePreview">
+              <div class="image-preview-placeholder">
+                <i class="fas fa-camera"></i>
+                <p>Upload animal's face image</p>
+              </div>
+              <img id="previewFaceImage" src="" alt="Face Preview">
+            </div>
+            <input type="file" id="faceImage" name="faceImage" accept="image/*" required>
+          </div>
+          
+          <div class="image-upload-group">
+            <h4>Animal Full Body Image</h4>
+            <div class="image-preview image-preview-small" id="bodyImagePreview">
+              <div class="image-preview-placeholder">
+                <i class="fas fa-image"></i>
+                <p>Upload animal's full body image</p>
+              </div>
+              <img id="previewBodyImage" src="" alt="Body Preview">
+            </div>
+            <input type="file" id="bodyImage" name="bodyImage" accept="image/*" required>
+          </div>
+          
+          <!-- Added fields on the first page -->
+          <div class="row">
+            <div class="form-group">
+              <label for="milkPerDay">Milk Production (liters/day)</label>
+              <input type="number" id="milkPerDay" name="milkPerDay" step="0.1" placeholder="Average milk per day">
+            </div>
+            <div class="form-group">
+              <label for="wither">Wither Height (cm)</label>
+              <input type="number" id="wither" name="wither" placeholder="Height at withers">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="purpose">Purpose</label>
+            <select id="purpose" name="purpose" required>
+              <option value="">Select</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Draught">Draught</option>
+              <option value="Breeding">Breeding</option>
+              <option value="Meat">Meat</option>
+              <option value="Dual Purpose">Dual Purpose</option>
+            </select>
+          </div>
+          
+          <!-- Breed Detection Section (Moved Below Input Fields) -->
+          <button type="button" class="btn detect-btn" id="detectBreed">
+            <i class="fas fa-search"></i> Detect Breed
+          </button>
+          
+          <div class="detection-loading" id="detectionLoading">
+            <div class="spinner"></div>
+            <p>Analyzing image and detecting breed...</p>
+          </div>
+          
+          <div class="breed-result" id="breedResult">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h3>Breed Detected Successfully!</h3>
+            <p>The breed has been auto-filled below</p>
+          </div>
+          
+          <div class="form-group">
+            <label for="breed">Detected Breed</label>
+            <input type="text" id="breed" name="breed" placeholder="Breed will be auto-detected" readonly>
+          </div>
+          
+          <div class="btn-container">
+            <div></div>
+            <button type="button" class="btn btn-next" id="next-1">Next <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Animal Details -->
+        <div class="form-step" id="step-2">
+          <div class="row">
+            <div class="form-group">
+              <label for="age">Age (Years)</label>
+              <input type="number" id="age" name="age" required>
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="form-group">
+              <label for="weight">Weight (kg)</label>
+              <input type="number" id="weight" name="weight">
+            </div>
+            <div class="form-group">
+              <label for="color">Color</label>
+              <input type="text" id="color" name="color">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="tagId">Unique Tag ID</label>
+            <input type="text" id="tagId" name="tagId" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="vaccinationStatus">Vaccination Status</label>
+            <input type="text" id="vaccinationStatus" name="vaccinationStatus" placeholder="e.g. FMD vaccinated">
+          </div>
+          
+          <div class="form-group">
+            <label for="lastCheckup">Last Checkup Date</label>
+            <input type="date" id="lastCheckup" name="lastCheckup">
+          </div>
+          
+          <div class="form-group">
+            <label for="nutrition">Nutrition Info</label>
+            <textarea id="nutrition" name="nutrition" placeholder="Feeding details"></textarea>
+          </div>
+          
+          <div class="btn-container">
+            <button type="button" class="btn btn-prev" id="prev-2"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button type="button" class="btn btn-next" id="next-2">Next <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+        
+        <!-- Step 3: Owner Details -->
+        <div class="form-step" id="step-3">
+          <h3 style="color:#003057;">Owner Details</h3>
+          <div class="form-group">
+            <label for="ownerName">Owner Name</label>
+            <input type="text" id="ownerName" name="ownerName" required>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label for="ownerPhone">Owner Phone</label>
+              <input type="tel" id="ownerPhone" name="ownerPhone" required>
+            </div>
+            <div class="form-group">
+              <label for="location">Village / District</label>
+              <input type="text" id="location" name="location">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="flwId">FLW ID / Aadhaar</label>
+            <input type="text" id="flwId" name="flwId" required>
+          </div>
+          <div class="btn-container">
+            <button type="button" class="btn btn-prev" id="prev-3"><i class="fas fa-arrow-left"></i> Previous</button>
+            <button type="submit" class="btn btn-submit"><i class="fas fa-paper-plane"></i> Register Animal</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="js/register.js"></script>
+</body>
+</html>
