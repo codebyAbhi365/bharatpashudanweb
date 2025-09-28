@@ -304,6 +304,16 @@
       background: #218838;
     }
     
+    .detect-btn:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    
+    .detect-btn:disabled:hover {
+      background: #6c757d;
+    }
+    
     /* Detection Loading */
     .detection-loading {
       display: none;
@@ -545,8 +555,8 @@
           <!-- Added fields on the first page -->
           <div class="row">
             <div class="form-group">
-              <label for="milkPerDay">Milk Production (liters/day)</label>
-              <input type="number" id="milkPerDay" name="milkPerDay" step="0.1" placeholder="Average milk per day">
+              <label for="milkPerDay">Milk Production (liters/day) *</label>
+              <input type="number" id="milkPerDay" name="milkPerDay" step="0.1" placeholder="Average milk per day" required>
             </div>
             <div class="form-group">
               <label for="wither">Wither Height (cm)</label>
@@ -556,7 +566,7 @@
           
           <div class="form-group">
             <label for="purpose">Purpose</label>
-            <select id="purpose" name="purpose" required>
+            <select id="purpose" name="purpose">
               <option value="">Select</option>
               <option value="Dairy">Dairy</option>
               <option value="Draught">Draught</option>
@@ -567,10 +577,14 @@
           </div>
           
           <!-- Breed Detection Section -->
-          <button type="button" class="btn detect-btn" id="detectBreed">
+          <button type="button" class="btn detect-btn" id="detectBreed" disabled>
             <i class="fas fa-search"></i> Detect Breed
           </button>
-
+          
+          <div id="detectBreedMessage" style="color: #6c757d; font-size: 14px; margin-top: 10px; text-align: center; font-weight: 500;">
+            <i class="fas fa-info-circle"></i> Upload both images to enable breed detection
+          </div>
+          
           <div style="color: #dc3545; font-size: 20px; margin-top: 10px; text-align: center; font-weight: 500;">
             <i class="fas fa-info-circle"></i> Note: This is currently a static website. We are working on integrating our ML model for real-time breed detection.
           </div>
@@ -633,12 +647,12 @@
         <div class="form-step" id="step-2">
           <div class="row">
             <div class="form-group">
-              <label for="age">Age (Years)</label>
+              <label for="age">Age (Years) *</label>
               <input type="number" id="age" name="age" required>
             </div>
             <div class="form-group">
               <label for="gender">Gender</label>
-              <select id="gender" name="gender" required>
+              <select id="gender" name="gender">
                 <option value="">Select</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -658,7 +672,7 @@
           </div>
           
           <div class="form-group">
-            <label for="tagId">Unique Tag ID</label>
+            <label for="tagId">Unique Tag ID *</label>
             <input type="text" id="tagId" name="tagId" required>
           </div>
           
@@ -687,12 +701,12 @@
         <div class="form-step" id="step-3">
           <h3 style="color:#003057;">Owner Details</h3>
           <div class="form-group">
-            <label for="ownerName">Owner Name</label>
+            <label for="ownerName">Owner Name *</label>
             <input type="text" id="ownerName" name="ownerName" required>
           </div>
           <div class="row">
             <div class="form-group">
-              <label for="ownerPhone">Owner Phone</label>
+              <label for="ownerPhone">Owner Phone *</label>
               <input type="tel" id="ownerPhone" name="ownerPhone" required>
             </div>
             <div class="form-group">
@@ -702,7 +716,7 @@
           </div>
           <div class="form-group">
             <label for="flwId">FLW ID / Aadhaar</label>
-            <input type="text" id="flwId" name="flwId" required>
+            <input type="text" id="flwId" name="flwId">
           </div>
           <div class="btn-container">
             <button type="button" class="btn btn-prev" id="prev-3"><i class="fas fa-arrow-left"></i> Previous</button>
@@ -783,7 +797,7 @@
       // Do not advance step when clicking confirmCharacteristics
       if (button.id === 'confirmCharacteristics') return;
       button.addEventListener('click', () => {
-        if (currentStep < formSteps.length - 1) {
+        if (validateCurrentStep() && currentStep < formSteps.length - 1) {
           showStep(currentStep + 1);
         }
       });
@@ -797,6 +811,26 @@
       });
     });
 
+    // Function to check if both images are uploaded
+    function checkImagesUploaded() {
+      const faceImageFile = faceImage.files[0];
+      const bodyImageFile = bodyImage.files[0];
+      const detectBtn = document.getElementById('detectBreed');
+      const messageDiv = document.getElementById('detectBreedMessage');
+      
+      if (faceImageFile && bodyImageFile) {
+        detectBtn.disabled = false;
+        detectBtn.style.cursor = 'pointer';
+        messageDiv.innerHTML = '<i class="fas fa-check-circle"></i> Both images uploaded - Ready for breed detection!';
+        messageDiv.style.color = '#28a745';
+      } else {
+        detectBtn.disabled = true;
+        detectBtn.style.cursor = 'not-allowed';
+        messageDiv.innerHTML = '<i class="fas fa-info-circle"></i> Upload both images to enable breed detection';
+        messageDiv.style.color = '#6c757d';
+      }
+    }
+
     // Image preview functionality
     faceImage.addEventListener('change', function() {
       const file = this.files[0];
@@ -809,6 +843,7 @@
         }
         reader.readAsDataURL(file);
       }
+      checkImagesUploaded();
     });
 
     bodyImage.addEventListener('change', function() {
@@ -822,6 +857,7 @@
         }
         reader.readAsDataURL(file);
       }
+      checkImagesUploaded();
     });
 
     // Make image preview areas clickable
@@ -929,9 +965,132 @@
     // Form submission
     document.getElementById('animalForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      alert('Animal registration submitted successfully!');
-      // In a real application, you would send the form data to a server here
+      
+      // Show success message
+      const successMessage = document.createElement('div');
+      successMessage.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #28a745;
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+        z-index: 10000;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      `;
+      successMessage.innerHTML = `
+        <i class="fas fa-check-circle" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
+        <div>Breed Registered Successfully!</div>
+        <div style="font-size: 14px; margin-top: 10px; opacity: 0.9;">Redirecting to home page...</div>
+      `;
+      
+      document.body.appendChild(successMessage);
+      
+      // Redirect to home page after 3 seconds
+      setTimeout(() => {
+        window.location.href = 'index.html'; // Change this to your home page URL
+      }, 3000);
     });
+
+    // Form validation function
+    function validateCurrentStep() {
+      const currentStepElement = formSteps[currentStep];
+      const requiredFields = currentStepElement.querySelectorAll('[required]');
+      let isValid = true;
+      
+      // Clear previous error styling
+      requiredFields.forEach(field => {
+        field.style.borderColor = '';
+        const errorMsg = field.parentNode.querySelector('.error-message');
+        if (errorMsg) errorMsg.remove();
+      });
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          field.style.borderColor = '#dc3545';
+          const errorMsg = document.createElement('div');
+          errorMsg.className = 'error-message';
+          errorMsg.style.color = '#dc3545';
+          errorMsg.style.fontSize = '12px';
+          errorMsg.style.marginTop = '4px';
+          errorMsg.textContent = 'Required';
+          field.parentNode.appendChild(errorMsg);
+          isValid = false;
+        }
+      });
+      
+      // Step-specific validations
+      if (currentStep === 0) {
+        // Step 1: Only face image and milk production required
+        const faceImage = document.getElementById('faceImage');
+        const milkPerDay = document.getElementById('milkPerDay');
+        
+        if (!faceImage.files[0]) {
+          showFieldError(faceImage, 'Required');
+          isValid = false;
+        }
+        if (!milkPerDay.value.trim()) {
+          showFieldError(milkPerDay, 'Required');
+          isValid = false;
+        }
+      }
+      
+      if (currentStep === 1) {
+        // Step 2: Only age and tag ID required
+        const age = document.getElementById('age');
+        const tagId = document.getElementById('tagId');
+        
+        if (!age.value.trim()) {
+          showFieldError(age, 'Required');
+          isValid = false;
+        }
+        if (!tagId.value.trim()) {
+          showFieldError(tagId, 'Required');
+          isValid = false;
+        }
+      }
+      
+      if (currentStep === 2) {
+        // Step 3: Only owner name and phone required
+        const ownerName = document.getElementById('ownerName');
+        const ownerPhone = document.getElementById('ownerPhone');
+        
+        if (!ownerName.value.trim()) {
+          showFieldError(ownerName, 'Required');
+          isValid = false;
+        }
+        if (!ownerPhone.value.trim()) {
+          showFieldError(ownerPhone, 'Required');
+          isValid = false;
+        }
+      }
+      
+      if (!isValid) {
+        // Scroll to first error
+        const firstError = currentStepElement.querySelector('[style*="border-color: rgb(220, 53, 69)"]');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      
+      return isValid;
+    }
+    
+    function showFieldError(field, message) {
+      field.style.borderColor = '#dc3545';
+      const errorMsg = document.createElement('div');
+      errorMsg.className = 'error-message';
+      errorMsg.style.color = '#dc3545';
+      errorMsg.style.fontSize = '12px';
+      errorMsg.style.marginTop = '4px';
+      errorMsg.textContent = message;
+      field.parentNode.appendChild(errorMsg);
+    }
 
     // Initialize progress bar
     updateProgressBar();
