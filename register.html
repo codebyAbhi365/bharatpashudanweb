@@ -5,7 +5,489 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bharat Pashudhan - Animal Registration</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="css/register.css">
+  <style>
+    /* Base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: url('../public/form_background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      filter: blur(8px);
+      z-index: -1;
+    }
+    
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      padding: 30px;
+    }
+    
+    .form-title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .form-title h2 {
+      color: #003057;
+      font-weight: 600;
+    }
+    
+    /* Progress Steps - Chain Style */
+    .progress-container {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 40px;
+      align-items: center;
+    }
+    
+    .progress-bar {
+      position: absolute;
+      height: 4px;
+      background: #003057;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      z-index: 1;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-step {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 3px #e0e0e0;
+    }
+    
+    .progress-step.active {
+      background: #003057;
+      color: white;
+      box-shadow: 0 0 0 3px #003057;
+    }
+    
+    .progress-step.completed {
+      background: #28a745;
+      box-shadow: 0 0 0 3px #28a745;
+    }
+    
+    .progress-step::after {
+      content: attr(data-title);
+      position: absolute;
+      top: 55px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+    }
+    
+    .progress-step.active::after {
+      color: #003057;
+    }
+    
+    .progress-step.completed::after {
+      color: #28a745;
+    }
+    
+    .progress-connector {
+      flex: 1;
+      height: 4px;
+      background: #e0e0e0;
+      margin: 0 10px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .progress-connector.active {
+      background: #003057;
+    }
+    
+    /* Form Steps */
+    .form-step {
+      display: none;
+    }
+    
+    .form-step.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #003057;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #003057;
+      outline: none;
+    }
+    
+    .row {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .row .form-group {
+      flex: 1;
+    }
+    
+    /* Image Upload */
+    .image-upload-group {
+      margin-bottom: 25px;
+    }
+    
+    .image-upload-group h4 {
+      margin-bottom: 10px;
+      color: #003057;
+    }
+    
+    .image-preview {
+      width: 100%;
+      height: 200px;
+      border: 2px dashed #ddd;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      overflow: hidden;
+      position: relative;
+      transition: border 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .image-preview:hover {
+      border-color: #003057;
+    }
+    
+    .image-preview-placeholder {
+      text-align: center;
+      color: #888;
+    }
+    
+    .image-preview-placeholder i {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    
+    .image-upload-group input[type="file"] {
+      display: none;
+    }
+    
+    .upload-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #003057;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+    
+    .upload-btn:hover {
+      background: #002244;
+    }
+    
+    /* Buttons */
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-next, .btn-submit {
+      background: #003057;
+      color: white;
+    }
+    
+    .btn-next:hover, .btn-submit:hover {
+      background: #002244;
+    }
+    
+    .btn-prev {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-prev:hover {
+      background: #d0d0d0;
+    }
+    
+    .detect-btn {
+      background: #28a745;
+      color: white;
+      margin: 20px 0;
+    }
+    
+    .detect-btn:hover {
+      background: #218838;
+    }
+    
+    /* Detection Loading */
+    .detection-loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #003057;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Breed Result */
+    .breed-result {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: #d4edda;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    
+    .success-icon {
+      color: #28a745;
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    
+    /* Breed Characteristics */
+    .breed-characteristics {
+      display: none;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 1px solid #e6eaf0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .breed-characteristics .subtext {
+      color: #6b7280;
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .progress-wrap {
+      margin-top: 14px;
+      position: relative;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #eef2f7;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #28a745, #60d394);
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+
+    .progress-label {
+      margin-top: 8px;
+      font-weight: 600;
+      color: #003057;
+      display: inline-block;
+    }
+
+    .characteristics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .characteristics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .characteristic-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f9fbff;
+      border: 1px solid #e6eaf0;
+      border-radius: 8px;
+    }
+
+    .characteristic-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+      background: #eef7f1;
+      color: #28a745;
+    }
+
+    .characteristic-item.missed .characteristic-icon {
+      background: #fff4f4;
+      color: #e03131;
+    }
+
+    .characteristic-text {
+      flex: 1;
+      color: #111827;
+      font-size: 14px;
+    }
+    
+    .characteristic-checkbox { display: none; }
+    
+    .characteristic-match {
+      font-weight: 600;
+      color: #28a745;
+      margin-left: 10px;
+    }
+    
+    .match-summary {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #003057;
+    }
+    
+    .percentage-display {
+      font-size: 24px;
+      color: #28a745;
+      margin: 10px 0;
+    }
+    
+    /* Breed Info Card */
+    .breed-info-card {
+      background: #e8f4ff;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #003057;
+    }
+    
+    .breed-info-card h4 {
+      color: #003057;
+      margin-bottom: 10px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .progress-step::after {
+        font-size: 10px;
+      }
+      
+      .progress-step {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="main-content">
@@ -13,37 +495,50 @@
       <div class="form-title">
         <h2>Animal Registration Form</h2>
       </div>
-      <!-- Progress Steps -->
+      <!-- Progress Steps - Chain Style -->
       <div class="progress-container">
-        <div class="progress-bar" id="progress"></div>
-        <div class="progress-step active" data-title="Breed Detection"></div>
-        <div class="progress-step" data-title="Animal Details"></div>
-        <div class="progress-step" data-title="Owner Details"></div>
+        <div class="progress-step active" data-title="Breed Detection">
+          <i class="fas fa-paw"></i>
+        </div>
+        <div class="progress-connector"></div>
+        <div class="progress-step" data-title="Animal Details">
+          <i class="fas fa-cow"></i>
+        </div>
+        <div class="progress-connector"></div>
+        <div class="progress-step" data-title="Owner Details">
+          <i class="fas fa-user"></i>
+        </div>
       </div>
       <form id="animalForm">
         <!-- Step 1: Breed Detection -->
         <div class="form-step active" id="step-1">
           <div class="image-upload-group">
             <h4>Animal Face Image</h4>
-            <div class="image-preview image-preview-small" id="faceImagePreview">
+            <div class="image-preview" id="faceImagePreview">
               <div class="image-preview-placeholder">
                 <i class="fas fa-camera"></i>
                 <p>Upload animal's face image</p>
               </div>
               <img id="previewFaceImage" src="" alt="Face Preview">
             </div>
+            <label for="faceImage" class="upload-btn">
+              <i class="fas fa-upload"></i> Choose File
+            </label>
             <input type="file" id="faceImage" name="faceImage" accept="image/*" required>
           </div>
           
           <div class="image-upload-group">
             <h4>Animal Full Body Image</h4>
-            <div class="image-preview image-preview-small" id="bodyImagePreview">
+            <div class="image-preview" id="bodyImagePreview">
               <div class="image-preview-placeholder">
                 <i class="fas fa-image"></i>
                 <p>Upload animal's full body image</p>
               </div>
               <img id="previewBodyImage" src="" alt="Body Preview">
             </div>
+            <label for="bodyImage" class="upload-btn">
+              <i class="fas fa-upload"></i> Choose File
+            </label>
             <input type="file" id="bodyImage" name="bodyImage" accept="image/*" required>
           </div>
           
@@ -71,10 +566,42 @@
             </select>
           </div>
           
-          <!-- Breed Detection Section (Moved Below Input Fields) -->
+          <!-- Breed Detection Section -->
           <button type="button" class="btn detect-btn" id="detectBreed">
             <i class="fas fa-search"></i> Detect Breed
           </button>
+          
+          <!-- Breed Characteristics Section -->
+          <div class="breed-characteristics" id="breedCharacteristics">
+            <h3 id="characteristicsTitle">Breed Characteristics Analysis</h3>
+            <p class="subtext">Review the detected traits and confirm the breed.</p>
+
+            <div class="progress-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" id="confidenceFill"></div>
+              </div>
+              <span class="progress-label" id="confidenceLabel">Confidence: 0%</span>
+            </div>
+
+            <div class="breed-info-card">
+              <h4 id="breedInfoTitle">About Gir Breed</h4>
+              <p>The Gir is a famous Indian cattle breed known for its milk-producing ability and disease resistance. It originates from the Gir forest region of Gujarat.</p>
+            </div>
+
+            <div id="characteristicsList" class="characteristics-grid">
+              <!-- Characteristics will be dynamically added here -->
+            </div>
+
+            <div class="match-summary">
+              <div class="percentage-display" id="percentageDisplay">92% Match</div>
+              <div id="matchSummary">5/5 characteristics matched</div>
+            </div>
+
+            <div class="btn-container">
+              <button type="button" class="btn btn-prev" id="backToDetection"><i class="fas fa-arrow-left"></i> Back</button>
+              <button type="button" class="btn btn-next" id="confirmCharacteristics">Confirm Breed <i class="fas fa-check"></i></button>
+            </div>
+          </div>
           
           <div class="detection-loading" id="detectionLoading">
             <div class="spinner"></div>
@@ -83,8 +610,8 @@
           
           <div class="breed-result" id="breedResult">
             <i class="fas fa-check-circle success-icon"></i>
-            <h3>Breed Detected Successfully!</h3>
-            <p>The breed has been auto-filled below</p>
+            <h3>Gir Breed Detected Successfully!</h3>
+            <p id="breedMatchInfo">Your animal matched 5/5 characteristics with 92% accuracy.</p>
           </div>
           
           <div class="form-group">
@@ -181,6 +708,229 @@
       </form>
     </div>
   </div>
-  <script src="js/register.js"></script>
+  <script>
+    // Gir breed characteristics
+    const girCharacteristics = [
+      "Color: Red, white, or spotted coat",
+      "Horns: Long, curved, spiraled backward",
+      "Ears: Long, pendulous, drooping",
+      "Forehead: Prominent convex/bulging dome",
+      "Hump: Well-developed, prominent hump"
+    ];
+
+    // DOM elements
+    const formSteps = document.querySelectorAll('.form-step');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const progressConnectors = document.querySelectorAll('.progress-connector');
+    const nextButtons = document.querySelectorAll('.btn-next');
+    const prevButtons = document.querySelectorAll('.btn-prev');
+    const detectBreedBtn = document.getElementById('detectBreed');
+    const detectionLoading = document.getElementById('detectionLoading');
+    const breedResult = document.getElementById('breedResult');
+    const breedCharacteristicsSection = document.getElementById('breedCharacteristics');
+    const characteristicsList = document.getElementById('characteristicsList');
+    const matchSummary = document.getElementById('matchSummary');
+    const percentageDisplay = document.getElementById('percentageDisplay');
+    const confirmCharacteristicsBtn = document.getElementById('confirmCharacteristics');
+    const backToDetectionBtn = document.getElementById('backToDetection');
+    const breedInput = document.getElementById('breed');
+    const breedMatchInfo = document.getElementById('breedMatchInfo');
+    const faceImage = document.getElementById('faceImage');
+    const bodyImage = document.getElementById('bodyImage');
+    const faceImagePreview = document.getElementById('previewFaceImage');
+    const bodyImagePreview = document.getElementById('previewBodyImage');
+    const faceImagePreviewContainer = document.getElementById('faceImagePreview');
+    const bodyImagePreviewContainer = document.getElementById('bodyImagePreview');
+
+    // Form navigation
+    let currentStep = 0;
+
+    function updateProgressBar() {
+      progressSteps.forEach((step, index) => {
+        if (index < currentStep) {
+          step.classList.add('completed');
+          step.classList.remove('active');
+        } else if (index === currentStep) {
+          step.classList.add('active');
+          step.classList.remove('completed');
+        } else {
+          step.classList.remove('active', 'completed');
+        }
+      });
+      
+      progressConnectors.forEach((connector, index) => {
+        if (index < currentStep) {
+          connector.classList.add('active');
+        } else {
+          connector.classList.remove('active');
+        }
+      });
+    }
+
+    function showStep(stepIndex) {
+      formSteps.forEach(step => step.classList.remove('active'));
+      formSteps[stepIndex].classList.add('active');
+      
+      currentStep = stepIndex;
+      updateProgressBar();
+    }
+
+    nextButtons.forEach(button => {
+      // Do not advance step when clicking confirmCharacteristics
+      if (button.id === 'confirmCharacteristics') return;
+      button.addEventListener('click', () => {
+        if (currentStep < formSteps.length - 1) {
+          showStep(currentStep + 1);
+        }
+      });
+    });
+
+    prevButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        if (currentStep > 0) {
+          showStep(currentStep - 1);
+        }
+      });
+    });
+
+    // Image preview functionality
+    faceImage.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          faceImagePreview.src = e.target.result;
+          faceImagePreview.style.display = 'block';
+          document.querySelector('#faceImagePreview .image-preview-placeholder').style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    bodyImage.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          bodyImagePreview.src = e.target.result;
+          bodyImagePreview.style.display = 'block';
+          document.querySelector('#bodyImagePreview .image-preview-placeholder').style.display = 'none';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Make image preview areas clickable
+    faceImagePreviewContainer.addEventListener('click', function() {
+      faceImage.click();
+    });
+
+    bodyImagePreviewContainer.addEventListener('click', function() {
+      bodyImage.click();
+    });
+
+    // Breed detection simulation - Always detect as Gir
+    detectBreedBtn.addEventListener('click', function() {
+      // Show loading
+      detectionLoading.style.display = 'block';
+      breedResult.style.display = 'none';
+      breedCharacteristicsSection.style.display = 'none';
+      
+      // Simulate breed detection after a delay
+      setTimeout(() => {
+        detectionLoading.style.display = 'none';
+        
+        // Always detect as Gir breed
+        const detectedBreed = "Gir";
+        
+        // Show breed characteristics for confirmation
+        showBreedCharacteristics(detectedBreed);
+      }, 2000);
+    });
+
+    // Show breed characteristics for user confirmation
+    function showBreedCharacteristics(breed) {
+      characteristicsList.innerHTML = '';
+      
+      // Set dynamic titles/info
+      const characteristicsTitle = document.getElementById('characteristicsTitle');
+      const breedInfoTitle = document.getElementById('breedInfoTitle');
+      if (characteristicsTitle) characteristicsTitle.textContent = `${breed} Breed Characteristics Analysis`;
+      if (breedInfoTitle) breedInfoTitle.textContent = `About ${breed} Breed`;
+
+      // Generate a random match percentage between 85-98%
+      const matchPercentage = Math.floor(Math.random() * 14) + 85;
+      
+      // Calculate how many characteristics should match based on percentage
+      const totalCharacteristics = girCharacteristics.length;
+      const matchedCount = Math.round((matchPercentage / 100) * totalCharacteristics);
+      
+      girCharacteristics.forEach((characteristic, index) => {
+        const characteristicItem = document.createElement('div');
+        const isChecked = index < matchedCount;
+        characteristicItem.className = `characteristic-item ${isChecked ? 'matched' : 'missed'}`;
+        
+        characteristicItem.innerHTML = `
+          <span class="characteristic-icon">${isChecked ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>'}</span>
+          <span class="characteristic-text">${characteristic}</span>
+          ${isChecked ? '<span class="characteristic-match"><i class="fas fa-check"></i> Matched</span>' : ''}
+        `;
+        characteristicsList.appendChild(characteristicItem);
+      });
+      
+      // Update match summary with percentage
+      percentageDisplay.textContent = `${matchPercentage}% Match`;
+      matchSummary.textContent = `${matchedCount}/${totalCharacteristics} characteristics matched`;
+      
+      // Update confidence progress bar
+      const confidenceFill = document.getElementById('confidenceFill');
+      const confidenceLabel = document.getElementById('confidenceLabel');
+      if (confidenceFill) confidenceFill.style.width = `${matchPercentage}%`;
+      if (confidenceLabel) confidenceLabel.textContent = `Confidence: ${matchPercentage}%`;
+      
+      // Store the detected breed and match info for later use
+      breedCharacteristicsSection.dataset.detectedBreed = breed;
+      breedCharacteristicsSection.dataset.matchPercentage = matchPercentage;
+      breedCharacteristicsSection.dataset.matchedCount = matchedCount;
+      breedCharacteristicsSection.dataset.totalCount = totalCharacteristics;
+      
+      // Show characteristics section
+      breedCharacteristicsSection.style.display = 'block';
+    }
+
+    // Confirm breed characteristics
+    confirmCharacteristicsBtn.addEventListener('click', function() {
+      const detectedBreed = breedCharacteristicsSection.dataset.detectedBreed;
+      const matchPercentage = breedCharacteristicsSection.dataset.matchPercentage;
+      const matchedCount = breedCharacteristicsSection.dataset.matchedCount;
+      const totalCount = breedCharacteristicsSection.dataset.totalCount;
+      
+      // Update breed input
+      breedInput.value = detectedBreed;
+      
+      // Update breed result message
+      breedMatchInfo.textContent = `Your animal matched ${matchedCount} out of ${totalCount} characteristics with ${matchPercentage}% accuracy.`;
+      
+      // Keep user on this step, just show confirmation result
+      breedResult.style.display = 'block';
+      // Keep the characteristics section visible for review
+      breedCharacteristicsSection.style.display = 'block';
+    });
+
+    // Back to detection button
+    backToDetectionBtn.addEventListener('click', function() {
+      breedCharacteristicsSection.style.display = 'none';
+    });
+
+    // Form submission
+    document.getElementById('animalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Animal registration submitted successfully!');
+      // In a real application, you would send the form data to a server here
+    });
+
+    // Initialize progress bar
+    updateProgressBar();
+  </script>
 </body>
 </html>
